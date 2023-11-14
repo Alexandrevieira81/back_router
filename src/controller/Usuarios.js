@@ -158,7 +158,7 @@ export async function insertUsuarios(req, res) {
 
 export async function updateUsuarios(req, res) {
     let pessoa;
-   // let erros;
+    // let erros;
     let db = new sqlite3.Database('./database.db');
 
     try {
@@ -168,38 +168,38 @@ export async function updateUsuarios(req, res) {
         //console.log(erros);
         console.log("Atualização de usuários DADOS " + JSON.stringify(req.body));
 
-       // if (erros.length == 0) {
-            pessoa.senha = await criarHash(pessoa.senha);
-            db.get('SELECT * FROM usuario WHERE registro=?', req.params.registro, function (err, row) {
+        // if (erros.length == 0) {
+        pessoa.senha = await criarHash(pessoa.senha);
+        db.get('SELECT * FROM usuario WHERE registro=?', req.params.registro, function (err, row) {
 
-                if (row) {
-
-
-                    db.get('UPDATE usuario SET nome=?,email=?, senha=? WHERE registro=?', [pessoa.nome, pessoa.email, pessoa.senha, req.params.registro], function (err, row) {
-                        res.status(200).json({
-                            "success": true,
-                            "message": "Cadastro Alterado com Sucesso"
-                        })
-                    });
+            if (row) {
 
 
+                db.get('UPDATE usuario SET nome=?,email=?, senha=? WHERE registro=?', [pessoa.nome, pessoa.email, pessoa.senha, req.params.registro], function (err, row) {
+                    res.status(200).json({
+                        "success": true,
+                        "message": "Cadastro Alterado com Sucesso"
+                    })
+                });
 
-                } else {
-                    res.status(403).json({
-                        "success": false,
-                        "message": "Informe um Registro Válido!"
-                    });
-                }
 
-            });
+
+            } else {
+                res.status(403).json({
+                    "success": false,
+                    "message": "Informe um Registro Válido!"
+                });
+            }
+
+        });
 
         //} else {
-         //   res.status(403).json({
-         //       "success": false,
-          //      "message": erros
+        //   res.status(403).json({
+        //       "success": false,
+        //      "message": erros
         //    });
 
-       // }
+        // }
 
     } catch (error) {
 
@@ -353,9 +353,10 @@ export async function selectUser(req, res) {
 export async function deleteUsuarios(req, res) {
 
     let db = new sqlite3.Database('./database.db');
-    
+    let registro;
+
     try {
-        console.log("DELETAR O USUÁRIO ", req.params.registro)
+        console.log("DELETAR O USUÁRIO params", req.params.registro)
 
         if (!req.params.registro) {
 
@@ -366,13 +367,38 @@ export async function deleteUsuarios(req, res) {
 
         } else {
 
-            db.get('DELETE FROM usuario WHERE registro=?', [req.params.registro], function (err, row) {
-                res.status(200).json({
-                    "success": true,
-                    "message": "O Usuário foi apagado com sucesso."
-                })
+            const token = req.headers['authorization'].split(' ')[1];
+
+            jwt.verify(token, SECRET, (err, decoded) => {
+                registro = decoded.registro;
+
 
             });
+            console.log("Registro do token "+registro)
+            if (req.params.registro == registro) {
+
+                db.get('DELETE FROM usuario WHERE registro=?', [req.params.registro], function (err, row) {
+                    res.status(200).json({
+                        "success": true,
+                        "message": "O Usuário foi apagado com sucesso, Você foi desconectado."
+                    })
+    
+                });
+               
+                await dbx.run('INSERT INTO blacklist (token) VALUES (?)', [token]);
+                logados.delete(registro);
+                listarUsuarios();
+            }else{
+                db.get('DELETE FROM usuario WHERE registro=?', [req.params.registro], function (err, row) {
+                    res.status(200).json({
+                        "success": true,
+                        "message": "O Usuário foi apagado com sucesso."
+                    })
+    
+                });
+
+
+            }
         }
 
     } catch (error) {
@@ -398,12 +424,15 @@ async function listarUsuarios() {
 
             db.get('SELECT * FROM usuario WHERE registro=?', log[i], function (err, row) {
 
+                if(row){
+                    console.log(row.registro);
+                    console.log(row.nome);
+                    console.log("___________________________________________");
 
-                console.log(row.registro);
-                console.log(row.nome);
-                console.log("___________________________________________")
-
-
+                }else{
+                    console.log("Capturou o erro no row");
+                }
+         
             });
 
         }
