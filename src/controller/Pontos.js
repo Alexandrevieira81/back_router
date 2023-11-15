@@ -55,7 +55,7 @@ export async function selectPontos(req, res) {
 
 export async function updatePontos(req, res) {
     let pontos = req.body;
-    console.log(pontos);
+    console.log(pontos.id);
     let db = new sqlite3.Database('./database.db');
     try {
 
