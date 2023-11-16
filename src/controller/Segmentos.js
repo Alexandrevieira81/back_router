@@ -35,7 +35,15 @@ export async function selectSegmentos(req, res) {
 
     try {
 
-        db.all('SELECT * FROM segmentos', function (err, row) {
+     /*    db.all('SELECT * FROM segmentos', function (err, row) {
+            console.log(row);
+            res.status(200).json({ segmentos: row, "success": true, "message": "Segmentos Encontrados!." });
+
+        }); */
+
+        let sql = 'SELECT segmentos.id, pontos_iniciais.nome AS ponto_inicial, pontos_finais.nome AS ponto_final,segmentos.distancia,segmentos.direcao,segmentos.status FROM segmentos INNER JOIN pontos AS pontos_iniciais ON segmentos.ponto_inicial = pontos_iniciais.id INNER JOIN pontos AS pontos_finais ON segmentos.ponto_final = pontos_finais.id';
+
+        db.all(sql, function (err, row) {
             console.log(row);
             res.status(200).json({ segmentos: row, "success": true, "message": "Segmentos Encontrados!." });
 

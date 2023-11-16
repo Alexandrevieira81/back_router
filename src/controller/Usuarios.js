@@ -1,7 +1,7 @@
 import { openDb } from "../configDB.js";
 import sqlite3 from 'sqlite3';
 import jwt from 'jsonwebtoken';
-import { criarHash, verificarCadastro, logados } from "../funcoes.js";
+import { criarHash, verificarCadastro, logados, verificarLastADM } from "../funcoes.js";
 import bcrypt from 'bcrypt';
 const SECRET = 'alexvieira';
 const dbx = await openDb();
@@ -324,6 +324,7 @@ export async function selectUser(req, res) {
 
             if (row) {
 
+
                 let usuario = JSON.stringify({ usuario: row, "success": true, "message": "Usuário Encontrado!." });
 
                 //console.log(usuario);
@@ -356,49 +357,62 @@ export async function deleteUsuarios(req, res) {
     let registro;
 
     try {
-        console.log("DELETAR O USUÁRIO params", req.params.registro)
+        console.log("DELETAR O USUÁRIO params", req.params.registro);
 
-        if (!req.params.registro) {
+        let contador = await verificarLastADM();
+        console.log("Quantidade de Administradores "+contador);
+
+        if (contador > 4) {
+            if (!req.params.registro) {
+
+                res.status(403).json({
+                    "success": false,
+                    "message": "Informe o REGISTRO do Usuário..."
+                })
+
+            } else {
+
+                const token = req.headers['authorization'].split(' ')[1];
+
+                jwt.verify(token, SECRET, (err, decoded) => {
+                    registro = decoded.registro;
+
+
+                });
+                console.log("Registro do token " + registro)
+                if (req.params.registro == registro) {
+
+                    db.get('DELETE FROM usuario WHERE registro=?', [req.params.registro], function (err, row) {
+                        res.status(200).json({
+                            "success": true,
+                            "message": "O Usuário foi apagado com sucesso, Você foi desconectado."
+                        })
+
+                    });
+
+                    await dbx.run('INSERT INTO blacklist (token) VALUES (?)', [token]);
+                    logados.delete(registro);
+                    listarUsuarios();
+                } else {
+                    db.get('DELETE FROM usuario WHERE registro=?', [req.params.registro], function (err, row) {
+                        res.status(200).json({
+                            "success": true,
+                            "message": "O Usuário foi apagado com sucesso."
+                        })
+
+                    });
+
+
+                }
+            }
+
+        }else{
 
             res.status(403).json({
                 "success": false,
-                "message": "Informe o REGISTRO do Usuário..."
+                "message": "Não é Possivel Deletar o Último Administrador..."
             })
 
-        } else {
-
-            const token = req.headers['authorization'].split(' ')[1];
-
-            jwt.verify(token, SECRET, (err, decoded) => {
-                registro = decoded.registro;
-
-
-            });
-            console.log("Registro do token "+registro)
-            if (req.params.registro == registro) {
-
-                db.get('DELETE FROM usuario WHERE registro=?', [req.params.registro], function (err, row) {
-                    res.status(200).json({
-                        "success": true,
-                        "message": "O Usuário foi apagado com sucesso, Você foi desconectado."
-                    })
-    
-                });
-               
-                await dbx.run('INSERT INTO blacklist (token) VALUES (?)', [token]);
-                logados.delete(registro);
-                listarUsuarios();
-            }else{
-                db.get('DELETE FROM usuario WHERE registro=?', [req.params.registro], function (err, row) {
-                    res.status(200).json({
-                        "success": true,
-                        "message": "O Usuário foi apagado com sucesso."
-                    })
-    
-                });
-
-
-            }
         }
 
     } catch (error) {
@@ -424,15 +438,15 @@ async function listarUsuarios() {
 
             db.get('SELECT * FROM usuario WHERE registro=?', log[i], function (err, row) {
 
-                if(row){
+                if (row) {
                     console.log(row.registro);
                     console.log(row.nome);
                     console.log("___________________________________________");
 
-                }else{
+                } else {
                     console.log("Capturou o erro no row");
                 }
-         
+
             });
 
         }

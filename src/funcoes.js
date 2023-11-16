@@ -1,14 +1,18 @@
 import jwt from 'jsonwebtoken';
+import { openDb } from "./configDB.js";
 import sqlite3 from 'sqlite3';
 import bcrypt from 'bcrypt';
 import { Logados } from './controller/Logados.js';
 import * as EmailValidator from 'email-validator';
 const SECRET = 'alexvieira';
+const dbx = await openDb();
+
+
 
 export let logados = new Logados();
 export async function verificarADM(req, res, next) {
   //console.log("entrou no verificar ADM "+ req.body);
- 
+
 
   let db = new sqlite3.Database('./database.db');
   let registroaux = "";
@@ -100,10 +104,10 @@ export async function verificarADM(req, res, next) {
 };
 
 export async function verificarUSER(req, res, next) {
-  
+
   let db = new sqlite3.Database('./database.db');
   //console.log("Passou pelo verifica user");
-  
+
   try {
 
     const token = req.headers['authorization'].split(' ')[1];
@@ -146,7 +150,7 @@ export async function verificarUSER(req, res, next) {
 };
 
 export async function verificarUSERLogout(req, res, next) {
-  
+
   let db = new sqlite3.Database('./database.db');
   //console.log(token);
 
@@ -161,7 +165,7 @@ export async function verificarUSERLogout(req, res, next) {
 
       } else {
         db.get('SELECT * FROM blacklist WHERE token=?', [token], function (err, row) {
-         
+
           if (row) {
 
             res.status(401).json({
@@ -205,7 +209,7 @@ export async function verificarCadastro(pessoa) {
   try {
     console.log("Verifica campos ", pessoa);
     let registro = String(pessoa.registro);
-   // registro= registro.trim();
+    // registro= registro.trim();
     console.log(registro);
 
     if (pessoa.registro == "") {
@@ -217,11 +221,11 @@ export async function verificarCadastro(pessoa) {
 
 
     }
-   /*  if ((registro.length) != 7) {
-      erros.push("O registro Precisa conter 7 números");
-
-
-    } */
+    /*  if ((registro.length) != 7) {
+       erros.push("O registro Precisa conter 7 números");
+ 
+ 
+     } */
     if ((pessoa.nome === null) || (pessoa.email === null) || (pessoa.senha === null) || (pessoa.registro === null) || (pessoa.tipo_usuario === null)) {
       erros.push("Informe o Todos os Campos");
 
@@ -254,5 +258,32 @@ export async function verificarCadastro(pessoa) {
 
 }
 
+export async function verificarLastADM() {
+
+  let db = new sqlite3.Database('./database.db');
+  let contador;
+
+  try {
+
+    let row = await dbx.get('SELECT COUNT(*) FROM usuario WHERE tipo_usuario = 1');
+
+    contador = row['COUNT(*)'];
+
+
+    console.log("QUANTIDADE DE ADMINISTRADORES ENCONTRADOS " + contador);
+    return contador;
+
+  } catch (error) {
+    console.log("Erro ao Verificar Existência de Administradores no Banco de Dados");
+
+  } finally {
+
+    db.close;
+  }
+
+
+
+
+}
 
 
