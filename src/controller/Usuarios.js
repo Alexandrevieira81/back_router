@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { criarHash, verificarCadastro, logados, verificarLastADM } from "../funcoes.js";
 import bcrypt from 'bcrypt';
 const SECRET = 'alexvieira';
+import ReverseMd5 from 'reverse-md5';
 const dbx = await openDb();
 
 export async function createTableUsuarios() {
@@ -76,6 +77,9 @@ export async function usuarioLogin(req, res) {
         let log = JSON.stringify(req.body);
         console.log("Login " + log);
 
+        //let senhadecrypt = await decryptMD5(req.body.senha);
+       // console.log("decript no login " + senhadecrypt['str']);
+    
         if (logados.get(req.body.registro) === false) {
 
             db.get('SELECT * FROM usuario WHERE registro=?', [req.body.registro], function (err, row) {
@@ -360,7 +364,7 @@ export async function deleteUsuarios(req, res) {
         console.log("DELETAR O USUÁRIO params", req.params.registro);
 
         let contador = await verificarLastADM();
-        console.log("Quantidade de Administradores "+contador);
+        console.log("Quantidade de Administradores " + contador);
 
         if (contador > 4) {
             if (!req.params.registro) {
@@ -406,7 +410,7 @@ export async function deleteUsuarios(req, res) {
                 }
             }
 
-        }else{
+        } else {
 
             res.status(403).json({
                 "success": false,
@@ -458,5 +462,21 @@ async function listarUsuarios() {
         db.close;
     }
 
+
+}
+
+async function decryptMD5(senha) {
+
+    var rev = ReverseMd5({
+        lettersUpper: false,
+        lettersLower: true,
+        numbers: true,
+        special: false,
+        whitespace: true,
+        maxLen: 5
+    })
+    let senhadecrypt = await rev(senha);
+    console.log(senhadecrypt);
+    return senhadecrypt;
 
 }

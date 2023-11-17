@@ -57,6 +57,43 @@ export async function selectSegmentos(req, res) {
     }
 }
 
+export async function selectSegmentosID(req, res) {
+    let segmento = req.params.id;
+    console.log(segmento);
+
+    let db = new sqlite3.Database('./database.db');
+
+    try {
+
+
+
+        let sql = 'SELECT segmentos.id, pontos_iniciais.nome AS ponto_inicial, pontos_finais.nome AS ponto_final,segmentos.distancia,segmentos.direcao,segmentos.status FROM segmentos INNER JOIN pontos AS pontos_iniciais ON segmentos.ponto_inicial = pontos_iniciais.id INNER JOIN pontos AS pontos_finais ON segmentos.ponto_final = pontos_finais.id WHERE segmentos.id=?';
+
+        db.get(sql,[segmento], function (err, row) {
+
+            if(row){
+                console.log(row);
+                res.status(200).json({ segmento: row, "success": true, "message": "Segmentos Encontrados!." });
+
+            }else{
+                res.status(403).json({
+                    "success": false,
+                    "message": "Não existe segmento com este código."
+                });
+
+            }
+          
+
+        });
+
+    } catch (error) {
+        res.status(403).json({
+            "success": false,
+            "message": "Não foi Possível Caregar os Segmentos."
+        });
+    }
+}
+
 export async function updateSegmentos(req, res) {
     let segmento = req.body;
     console.log(segmento);
@@ -72,7 +109,7 @@ export async function updateSegmentos(req, res) {
                 });
 
             } else {
-                res.status(400).json({
+                res.status(403).json({
                     "success": false,
                     "message": "Não foi possível Alterar o Segmento."
                 });
@@ -81,7 +118,7 @@ export async function updateSegmentos(req, res) {
 
     } catch (error) {
 
-        res.status(400).json({
+        res.status(403).json({
             "success": false,
             "message": "Não foi possível Alterar o Segmento."
         });
@@ -99,7 +136,7 @@ export async function deleteSegmento(req, res) {
 
         if (!req.params.id) {
 
-            res.status(400).json({
+            res.status(403).json({
                 "success": false,
                 "message": "Informe o Código do Segmento..."
             })
@@ -117,7 +154,7 @@ export async function deleteSegmento(req, res) {
 
     } catch (error) {
 
-        res.status(400).json({
+        res.status(403).json({
             "success": false,
             "message": "Segmento Inexistente..."
         })
