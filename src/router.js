@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { insertUsuarios, selectAllUser, selectUser, updateUsuarios, deleteUsuarios, usuarioLogin, usuarioLogout } from './controller/Usuarios.js';
-import { selectAllSegmentos, insertRota, insertSegmento, insertRotaSegmento, selectRotas } from "./controller/Rotas.js";
+import { selectAllSegmentos, insertRota, insertSegmento, insertRotaSegmento, selectRotas,selectAllRotas,bloquearDesbloquerSegmento } from "./controller/Rotas.js";
 import { insertSegmentos,selectSegmentosID, updateSegmentos, selectSegmentos, deleteSegmento } from "./controller/Segmentos.js"
 import { insertPonto,selectPontosID, selectPontos, updatePontos, deletePontos } from "./controller/Pontos.js"
 import { verificarADM, verificarUSER, verificarUSERLogout } from "./funcoes.js";
@@ -43,5 +43,8 @@ router.delete('/pontos/:id', deletePontos);
 
 //Seleciona e calculas as rotas baseado no ponto de origem e destino
 router.post('/rotas', verificarUSER, selectRotas);
+router.get('/Allrotas', verificarUSER, selectAllRotas);
+
+router.put('/bloquearDesbloquerSegmento',bloquearDesbloquerSegmento);
 
 export default router;

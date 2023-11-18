@@ -322,13 +322,13 @@ export async function selectUser(req, res) {
     let db = new sqlite3.Database('./database.db');
 
     try {
-        //console.log(" Solicitação dos dados de Usuário " + JSON.stringify(req.headers));
+        console.log(" Solicitação dos dados de Usuário "+req.params.registro);
 
         db.get('SELECT nome,registro,email,tipo_usuario  FROM usuario where registro=?', [req.params.registro], function (err, row) {
 
             if (row) {
 
-
+                console.log(row);
                 let usuario = JSON.stringify({ usuario: row, "success": true, "message": "Usuário Encontrado!." });
 
                 //console.log(usuario);
