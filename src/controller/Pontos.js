@@ -53,6 +53,30 @@ export async function selectPontos(req, res) {
     }
 }
 
+export async function selectPontosID(req, res) {
+    let pontosID = req.params.id;
+    console.log(pontosID);
+
+    let db = new sqlite3.Database('./database.db');
+
+    try {
+
+        db.get('SELECT * FROM pontos WHERE id=?',[pontosID], function (err, row) {
+            console.log(row);
+            res.status(200).json({ ponto: row, "success": true, "message": "Ponto Encontrado!." });
+
+        });
+
+    } catch (error) {
+        res.status(403).json({
+            "success": false,
+            "message": "Não foi Possível Caregar os Pontos."
+        });
+    }finally{
+        db.close;
+    }
+}
+
 export async function updatePontos(req, res) {
     let pontos = req.body;
     console.log(pontos.id);

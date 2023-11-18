@@ -2,7 +2,7 @@ import { Router } from "express";
 import { insertUsuarios, selectAllUser, selectUser, updateUsuarios, deleteUsuarios, usuarioLogin, usuarioLogout } from './controller/Usuarios.js';
 import { selectAllSegmentos, insertRota, insertSegmento, insertRotaSegmento, selectRotas } from "./controller/Rotas.js";
 import { insertSegmentos,selectSegmentosID, updateSegmentos, selectSegmentos, deleteSegmento } from "./controller/Segmentos.js"
-import { insertPonto, selectPontos, updatePontos, deletePontos } from "./controller/Pontos.js"
+import { insertPonto,selectPontosID, selectPontos, updatePontos, deletePontos } from "./controller/Pontos.js"
 import { verificarADM, verificarUSER, verificarUSERLogout } from "./funcoes.js";
 const router = Router();
 
@@ -34,6 +34,7 @@ router.delete('/segmentos/:id', deleteSegmento);
 
 router.post('/pontos', insertPonto);
 router.get('/pontos', selectPontos);
+router.get('/pontos/:id', selectPontosID);
 router.put('/pontos', updatePontos);
 router.delete('/pontos/:id', deletePontos);
 
