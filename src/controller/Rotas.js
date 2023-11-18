@@ -287,7 +287,7 @@ export async function selectAllRotas(req, res) {
 
     try {
 
-        db.all('SELECT * FROM segmento ORDER BY ordem', function (err, row) {
+        db.all('SELECT rota.nome_rota,segmento.idsegmento,segmento.nome,segmento.distancia,segmento.direcao,segmento.ponto_inicial,segmento.ponto_final,segmento.ordem,segmento.status FROM rota,segmento,rotasegmento where rotasegmento.id_rota = rota.idrota and segmento.idsegmento = rotasegmento.id_segmento ORDER BY nome_rota', function (err, row) {
             console.log(row);
             res.status(200).json(row);
 
