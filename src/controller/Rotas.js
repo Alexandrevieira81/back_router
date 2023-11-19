@@ -19,9 +19,13 @@ export async function createTableSegmentoRota() {
 };
 
 export async function insertSegmento(req, res) {
-    let segmento = req.body;
-    console.log(segmento);
+    let segmento;
+  
     try {
+
+        segmento = req.body;
+        console.log("Cadastrando Segmento");
+        console.log(segmento);
 
         await dbx.get('INSERT INTO segmento(nome, distancia, direcao, ponto_inicial, ponto_final, ordem, status) VALUES (?,?,?,?,?,?,?)', [segmento.nome, segmento.distancia, segmento.direcao, segmento.ponto_inicial, segmento.ponto_final, segmento.ordem, segmento.status]);
         res.status(200).json({
@@ -45,9 +49,10 @@ export async function bloquearDesbloquerSegmento(req, res) {
 
     try {
         segmento = req.body;
+        console.log("Desbloqueando ou Bloqueando Segmento");
         console.log(segmento);
         db.get('SELECT * FROM segmento WHERE idsegmento=?', segmento.idsegmento, function (err, row) {
-            console.log("retornou a busca segmento");
+            console.log("Verificação se o Segmento é válido");
             console.log(row);
             if (row) {
 
@@ -99,10 +104,14 @@ export async function bloquearDesbloquerSegmento(req, res) {
 }
 
 export async function insertRota(req, res) {
-    let rota = req.body;
+    let rota;
     console.log(rota);
 
     try {
+
+        rota = req.body;
+        console.log("Cadastro de Rota");
+        console.log(rota);
         await dbx.get('INSERT INTO rota (nome_rota, origem, destino) VALUES (?,?,?)', [rota.nome_rota, rota.origem, rota.destino]);
         res.status(200).json({
             "success": true,
@@ -119,10 +128,14 @@ export async function insertRota(req, res) {
 }
 
 export async function insertRotaSegmento(req, res) {
-    let rotaseg = req.body;
-    console.log(rotaseg);
+    let rotaseg;
+   
 
     try {
+
+        rotaseg = req.body;
+        console.log("Cadastro de Rota Segmento");
+        console.log(rotaseg);
 
         await dbx.get('INSERT INTO rotasegmento (id_rota , id_segmento) VALUES (?,?)', [rotaseg.id_rota, rotaseg.id_segmento]);
         res.status(200).json({
@@ -143,12 +156,9 @@ export async function insertRotaSegmento(req, res) {
 export async function selectRotas(req, res) {
     //let origem = req.params?.origem;
     // let destino = req.params?.destino;
-
-    let origem = req.body.origem;
-    let destino = req.body.destino;
-
-
     let db = new sqlite3.Database('./database.db');
+    let origem;
+    let destino;
     let rota = [];
     let rota_filtrada = [];
     let flag_rota_nome;
@@ -158,6 +168,9 @@ export async function selectRotas(req, res) {
 
 
     try {
+        origem = req.body.origem;
+        destino = req.body.destino;
+        console.log("Foi solicitado o cálculo para a rota " + req.body);
 
         db.all('SELECT rota.nome_rota,segmento.nome,segmento.distancia,segmento.direcao,segmento.ponto_inicial,segmento.ponto_final,segmento.ordem,segmento.status FROM rota,segmento,rotasegmento where rota.origem=? and rota.destino=? and rotasegmento.id_rota = rota.idrota and segmento.idsegmento = rotasegmento.id_segmento', [origem, destino], function (err, row) {
 
@@ -259,26 +272,24 @@ export async function selectRotas(req, res) {
 
 
 
-export async function selectAllSegmentos(req, res) {
+// export async function selectAllSegmentos(req, res) {
+//     let db = new sqlite3.Database('./database.db');
 
+//     try {
 
-    let db = new sqlite3.Database('./database.db');
+//         db.all('SELECT rota.nome_rota,segmento.nome,segmento.distancia,segmento.direcao,segmento.ponto_inicial,segmento.ponto_final,segmento.ordem,segmento.status FROM rota,segmento,rotasegmento where rotasegmento.id_rota = rota.idrota and segmento.idsegmento = rotasegmento.id_segmento ORDER BY ordem', function (err, row) {
+//             console.log(row);
+//             res.status(200).json(row);
 
-    try {
+//         });
 
-        db.all('SELECT rota.nome_rota,segmento.nome,segmento.distancia,segmento.direcao,segmento.ponto_inicial,segmento.ponto_final,segmento.ordem,segmento.status FROM rota,segmento,rotasegmento where rotasegmento.id_rota = rota.idrota and segmento.idsegmento = rotasegmento.id_segmento ORDER BY ordem', function (err, row) {
-            console.log(row);
-            res.status(200).json(row);
-
-        });
-
-    } catch (error) {
-        res.status(400).json({
-            "success": false,
-            "message": "Não foi Possível Caregar os Segmentos."
-        });
-    }
-}
+//     } catch (error) {
+//         res.status(400).json({
+//             "success": false,
+//             "message": "Não foi Possível Caregar os Segmentos."
+//         });
+//     }
+// }
 
 export async function selectAllRotas(req, res) {
 
@@ -286,9 +297,10 @@ export async function selectAllRotas(req, res) {
     let db = new sqlite3.Database('./database.db');
 
     try {
+        console.log("Entrou no Buscar Todas as Rotas");
 
         db.all('SELECT rota.nome_rota,segmento.idsegmento,segmento.nome,segmento.distancia,segmento.direcao,segmento.ponto_inicial,segmento.ponto_final,segmento.ordem,segmento.status FROM rota,segmento,rotasegmento where rotasegmento.id_rota = rota.idrota and segmento.idsegmento = rotasegmento.id_segmento ORDER BY nome_rota', function (err, row) {
-            console.log(row);
+
             res.status(200).json(row);
 
         });

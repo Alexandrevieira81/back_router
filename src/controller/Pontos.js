@@ -9,9 +9,12 @@ export async function createTablePontos() {
 
 
 export async function insertPonto(req, res) {
-    let ponto = req.body;
-    console.log(ponto.nome);
+    let ponto;
+
     try {
+        ponto = req.body;
+        console.log("Cadastrando Ponto");
+        console.log(ponto);
 
         await dbx.get('INSERT INTO pontos(nome) VALUES (?)', [ponto.nome]);
         res.status(200).json({
@@ -21,7 +24,7 @@ export async function insertPonto(req, res) {
 
     } catch (error) {
 
-        res.status(400).json({
+        res.status(403).json({
             "success": false,
             "message": "Não foi possível cadastrar o Ponto."
         });
@@ -30,12 +33,14 @@ export async function insertPonto(req, res) {
 }
 
 export async function selectPontos(req, res) {
-    let pontos = req.body;
-    console.log(pontos);
-
+    
     let db = new sqlite3.Database('./database.db');
 
     try {
+
+        
+        console.log("Selecionando Todos os Pontos");
+        
 
         db.all('SELECT * FROM pontos', function (err, row) {
             console.log(row);
@@ -44,24 +49,28 @@ export async function selectPontos(req, res) {
         });
 
     } catch (error) {
-        res.status(400).json({
+        res.status(403).json({
             "success": false,
             "message": "Não foi Possível Caregar os Pontos."
         });
-    }finally{
+    } finally {
         db.close;
     }
 }
 
 export async function selectPontosID(req, res) {
-    let pontosID = req.params.id;
-    console.log(pontosID);
+    let pontosID;
+    
 
     let db = new sqlite3.Database('./database.db');
 
     try {
 
-        db.get('SELECT * FROM pontos WHERE id=?',[pontosID], function (err, row) {
+        pontosID = req.params.id;
+        console.log("Selecionado ponto pelo ID");
+        console.log(pontosID);
+
+        db.get('SELECT * FROM pontos WHERE id=?', [pontosID], function (err, row) {
             console.log(row);
             res.status(200).json({ ponto: row, "success": true, "message": "Ponto Encontrado!." });
 
@@ -72,18 +81,24 @@ export async function selectPontosID(req, res) {
             "success": false,
             "message": "Não foi Possível Caregar os Pontos."
         });
-    }finally{
+    } finally {
         db.close;
     }
 }
 
 export async function updatePontos(req, res) {
-    let pontos = req.body;
-    console.log(pontos.id);
+    let pontos;
+   
     let db = new sqlite3.Database('./database.db');
     try {
 
-        db.get('UPDATE pontos SET nome=? WHERE id=?', [pontos.nome, pontos.id], function (err, row) {
+        pontos = req.body;
+        console.log("Update Pontos ID");
+        console.log(req.params.id);
+        console.log("Dados do Update");
+        console.log(pontos);
+
+        db.get('UPDATE pontos SET nome=? WHERE id=?', [pontos.nome, req.params.id], function (err, row) {
 
             if (!err) {
                 res.status(200).json({
@@ -92,7 +107,7 @@ export async function updatePontos(req, res) {
                 });
 
             } else {
-                res.status(400).json({
+                res.status(403).json({
                     "success": false,
                     "message": "Não foi possível Alterar o Ponto."
                 });
@@ -116,6 +131,8 @@ export async function deletePontos(req, res) {
 
     let db = new sqlite3.Database('./database.db');
     try {
+        console.log("Entrou no Deletar Ponto com o ID");
+        console.log(req.params.id);
 
         if (!req.params.id) {
 

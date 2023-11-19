@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { insertUsuarios, selectAllUser, selectUser, updateUsuarios, deleteUsuarios, usuarioLogin, usuarioLogout } from './controller/Usuarios.js';
-import { selectAllSegmentos, insertRota, insertSegmento, insertRotaSegmento, selectRotas,selectAllRotas,bloquearDesbloquerSegmento } from "./controller/Rotas.js";
+import { insertRota, insertSegmento, insertRotaSegmento, selectRotas,selectAllRotas,bloquearDesbloquerSegmento } from "./controller/Rotas.js";
 import { insertSegmentos,selectSegmentosID, updateSegmentos, selectSegmentos, deleteSegmento } from "./controller/Segmentos.js"
 import { insertPonto,selectPontosID, selectPontos, updatePontos, deletePontos } from "./controller/Pontos.js"
 import { verificarADM, verificarUSER, verificarUSERLogout } from "./funcoes.js";
@@ -27,7 +27,7 @@ router.post('/rota', insertRota);
 router.post('/rotasegmento', insertRotaSegmento);
 
 router.post('/segmentos', verificarADM, insertSegmentos);
-router.put('/segmentos', verificarADM, updateSegmentos);
+router.put('/segmentos/:id', verificarADM, updateSegmentos);
 router.get('/segmentos', selectSegmentos);
 router.get('/segmentos/:id', selectSegmentosID);
 router.delete('/segmentos/:id', deleteSegmento);
@@ -35,7 +35,7 @@ router.delete('/segmentos/:id', deleteSegmento);
 router.post('/pontos', insertPonto);
 router.get('/pontos', selectPontos);
 router.get('/pontos/:id', selectPontosID);
-router.put('/pontos', updatePontos);
+router.put('/pontos/:id', updatePontos);
 router.delete('/pontos/:id', deletePontos);
 
 //seleciona todos os pontos de segmento para o usuário poder escolher sua origem e destino

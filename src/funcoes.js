@@ -111,7 +111,8 @@ export async function verificarUSER(req, res, next) {
   try {
 
     const token = req.headers['authorization'].split(' ')[1];
-    console.log(token);
+    console.log("Verificando usuário");
+    console.log(req.headers);
     jwt.verify(token, SECRET, (err, decoded) => {
 
       if (err) {
@@ -122,7 +123,7 @@ export async function verificarUSER(req, res, next) {
         return;
       } else {
         db.get('SELECT * FROM blacklist WHERE token=?', [token], function (err, row) {
-          console.log(row);
+          //console.log(row);
           if (row) {
 
             res.status(401).json({
