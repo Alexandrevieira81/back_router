@@ -32,7 +32,7 @@ export async function usuarioLogout(req, res) {
 
         });
         console.log("Usuário " + registro + " Está tentado deslogar utilizando o token " + token);
-        if (logados.get(registro) === -1) {
+        if ((logados.get(registro)) === false) {
 
             res.status(403).json({
                 "success": false,
@@ -86,7 +86,9 @@ export async function usuarioLogin(req, res) {
 
                 if ((row) && (bcrypt.compareSync(req.body.senha, row.senha))) {
 
-                    logados.add(row.registro);
+                    console.log("Registro antes do add");
+                    console.log(req.body.registro);
+                    logados.add(req.body.registro);
                     const token = jwt.sign({ registro: row.registro }, SECRET, { expiresIn: 3000 });
                     res.status(200).json({
                         "registro": row.registro,
@@ -167,43 +169,59 @@ export async function updateUsuarios(req, res) {
 
     try {
 
+
+
         pessoa = req.body;
         //erros = await verificarCadastro(pessoa);
         //console.log(erros);
         console.log("Atualização de usuários DADOS " + JSON.stringify(req.body));
 
-        // if (erros.length == 0) {
-        pessoa.senha = await criarHash(pessoa.senha);
-        db.get('SELECT * FROM usuario WHERE registro=?', req.params.registro, function (err, row) {
+        if (pessoa.senha == "d41d8cd98f00b204e9800998ecf8427e") {
 
-            if (row) {
+            res.status(403).json({
+                "success": false,
+                "message": "A senha não pode ser vazia!"
+            });
+
+        } else {
+
+            // if (erros.length == 0) {
+            pessoa.senha = await criarHash(pessoa.senha);
+            db.get('SELECT * FROM usuario WHERE registro=?', req.params.registro, function (err, row) {
+
+                if (row) {
 
 
-                db.get('UPDATE usuario SET nome=?,email=?, senha=? WHERE registro=?', [pessoa.nome, pessoa.email, pessoa.senha, req.params.registro], function (err, row) {
-                    res.status(200).json({
-                        "success": true,
-                        "message": "Cadastro Alterado com Sucesso"
-                    })
-                });
+                    db.get('UPDATE usuario SET nome=?,email=?, senha=? WHERE registro=?', [pessoa.nome, pessoa.email, pessoa.senha, req.params.registro], function (err, row) {
+                        res.status(200).json({
+                            "success": true,
+                            "message": "Cadastro Alterado com Sucesso"
+                        })
+                    });
 
 
 
-            } else {
-                res.status(403).json({
-                    "success": false,
-                    "message": "Informe um Registro Válido!"
-                });
-            }
+                } else {
+                    res.status(403).json({
+                        "success": false,
+                        "message": "Informe um Registro Válido!"
+                    });
+                }
 
-        });
+            });
 
-        //} else {
-        //   res.status(403).json({
-        //       "success": false,
-        //      "message": erros
-        //    });
+            //} else {
+            //   res.status(403).json({
+            //       "success": false,
+            //      "message": erros
+            //    });
 
-        // }
+            // }
+
+
+        }
+
+
 
     } catch (error) {
 

@@ -17,8 +17,9 @@ export class Logados {
     }
 
     get(registro) {
+                      
+        var index = this.list.includes(String(registro));
         
-        var index = this.list.includes(parseInt(registro));
         return index;
     }
 }

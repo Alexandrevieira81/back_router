@@ -18,6 +18,8 @@ export async function verificarADM(req, res, next) {
   let registroaux = "";
   try {
     const token = req.headers['authorization'].split(' ')[1];
+    console.log("Chegou token no VerificarADM")
+    console.log(token);
     jwt.verify(token, SECRET, (err, decoded) => {
 
 
@@ -111,7 +113,7 @@ export async function verificarUSER(req, res, next) {
   try {
 
     const token = req.headers['authorization'].split(' ')[1];
-    console.log("Verificando usuário");
+    console.log("Chegou a requisção no verificarUser");
     console.log(req.headers);
     jwt.verify(token, SECRET, (err, decoded) => {
 
@@ -153,10 +155,12 @@ export async function verificarUSER(req, res, next) {
 export async function verificarUSERLogout(req, res, next) {
 
   let db = new sqlite3.Database('./database.db');
-  //console.log(token);
+  
 
   try {
     const token = req.headers['authorization'].split(' ')[1];
+    console.log("Chegou token no Verificarlogout")
+    console.log(token);
     jwt.verify(token, SECRET, (err, decoded) => {
       if (err) {
         res.status(401).json({
@@ -217,6 +221,13 @@ export async function verificarCadastro(pessoa) {
       erros.push("Informe o Código do Usuário");
 
     }
+
+    if (pessoa.senha== "d41d8cd98f00b204e9800998ecf8427e") {
+      erros.push("Senha não pode ser vazia");
+
+    }
+    
+    
     if (isNaN(pessoa.registro)) {
       erros.push("O Registro Aceita Apenas Números");
 
