@@ -1,10 +1,11 @@
 import { openDb } from "../configDB.js";
 import sqlite3 from 'sqlite3';
 import jwt from 'jsonwebtoken';
-import { criarHash, verificarCadastro, logados, verificarLastADM } from "../funcoes.js";
+import { criarHash, verificarCadastro,verificarLastADM } from "../funcoes.js";
 import bcrypt from 'bcrypt';
 const SECRET = 'alexvieira';
 import ReverseMd5 from 'reverse-md5';
+import { logados } from "../app.js";
 const dbx = await openDb();
 
 export async function createTableUsuarios() {

@@ -17,8 +17,18 @@ export class Logados {
     }
 
     get(registro) {
-                      
-        var index = this.list.includes(String(registro));
+
+        let index;
+      
+        if(typeof registro === "number") {
+            index = this.list.includes(String(registro));
+            console.log("Caiu no número");
+        }else{
+
+            index = this.list.includes(registro);
+            console.log("Caiu na String");
+        }              
+       
         
         return index;
     }

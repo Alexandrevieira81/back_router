@@ -2,14 +2,15 @@ import jwt from 'jsonwebtoken';
 import { openDb } from "./configDB.js";
 import sqlite3 from 'sqlite3';
 import bcrypt from 'bcrypt';
-import { Logados } from './controller/Logados.js';
+//import { Logados } from './controller/Logados.js';
+import { logados } from './app.js';
 import * as EmailValidator from 'email-validator';
 const SECRET = 'alexvieira';
 const dbx = await openDb();
 
 
 
-export let logados = new Logados();
+//export let logados = new Logados();
 export async function verificarADM(req, res, next) {
   //console.log("entrou no verificar ADM "+ req.body);
 
@@ -18,8 +19,8 @@ export async function verificarADM(req, res, next) {
   let registroaux = "";
   try {
     const token = req.headers['authorization'].split(' ')[1];
-    console.log("Chegou token no VerificarADM")
-    console.log(token);
+    console.log("logado teste");
+    console.log(logados.islogged());
     jwt.verify(token, SECRET, (err, decoded) => {
 
 

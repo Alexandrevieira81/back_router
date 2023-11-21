@@ -10,6 +10,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(router);
+export const logados = new Logados(); 
 createTableUsuarios();
 createTableBlacklist();
 createTableRota();
