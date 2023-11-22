@@ -3,33 +3,88 @@ export class Logados {
         this.list = [];
     }
 
-    add(registro) {
-        this.list.push(registro);
+    add(registro, token) {
+        let user = { registro: registro, token: token }
+        this.list.push(user);
     }
 
     islogged() {
         return this.list;
     }
 
-    delete(registro) {
-        var index = this.list.indexOf(registro);
-        this.list.splice(index, 1);
+    delete(token) {
+        let ret;
+        for (let i = 0; i < this.list.length; i++) {
+
+            if (this.list[i].token == token) {
+
+                ret = i;
+                
+                break;
+            }
+
+        }
+        this.list.splice(ret, 1);
     }
 
-    get(registro) {
+    getLogar(registro) {
 
-        let index;
-      
-        if(typeof registro === "number") {
-            index = this.list.includes(String(registro));
-            console.log("Caiu no número");
-        }else{
+        let aux;
+        let ret = -1;
 
-            index = this.list.includes(registro);
-            console.log("Caiu na String");
-        }              
-       
-        
-        return index;
+        if (typeof registro === "number") {
+            aux = (String(registro));
+            for (let i = 0; i < this.list.length; i++) {
+
+                if (this.list[i].registro == aux) {
+
+                    ret = 1;
+                }
+
+            }
+
+        } else {
+
+            for (let i = 0; i < this.list.length; i++) {
+
+                if (this.list[i].registro == registro) {
+
+                    ret = 1;
+                }
+
+            }
+        }
+
+        return ret;
+    }
+    getDeslogar(token) {
+
+        let aux;
+        let ret = -1;
+
+        if (typeof token === "number") {
+            aux = (String(token));
+            for (let i = 0; i < this.list.length; i++) {
+
+                if (this.list[i].token == aux) {
+
+                    ret = 1;
+                }
+
+            }
+
+        } else {
+
+            for (let i = 0; i < this.list.length; i++) {
+
+                if (this.list[i].token == token) {
+
+                    ret = 1;
+                }
+
+            }
+        }
+
+        return ret;
     }
 }

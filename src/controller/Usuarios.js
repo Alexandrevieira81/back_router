@@ -1,7 +1,7 @@
 import { openDb } from "../configDB.js";
 import sqlite3 from 'sqlite3';
 import jwt from 'jsonwebtoken';
-import { criarHash, verificarCadastro,verificarLastADM } from "../funcoes.js";
+import { criarHash, verificarCadastro, verificarLastADM } from "../funcoes.js";
 import bcrypt from 'bcrypt';
 const SECRET = 'alexvieira';
 import ReverseMd5 from 'reverse-md5';
@@ -27,13 +27,10 @@ export async function usuarioLogout(req, res) {
 
         const token = req.headers['authorization'].split(' ')[1];
 
-        jwt.verify(token, SECRET, (err, decoded) => {
-            registro = decoded.registro;
+       
 
-
-        });
         console.log("Usuário " + registro + " Está tentado deslogar utilizando o token " + token);
-        if ((logados.get(registro)) === false) {
+        if ((logados.getDeslogar(token)) === -1) {
 
             res.status(403).json({
                 "success": false,
@@ -43,15 +40,16 @@ export async function usuarioLogout(req, res) {
 
         } else {
 
-            await dbx.run('INSERT INTO blacklist (token) VALUES (?)', [token]);
+           await dbx.run('INSERT INTO blacklist (token) VALUES (?)', [token]);
 
             res.status(200).json({
                 "success": true,
                 "message": "Deslogado com sucesso.",
 
             });
+            console.log("Chegou no delete token")
 
-            logados.delete(registro);
+            logados.delete(token);
             listarUsuarios();
 
         }
@@ -66,7 +64,7 @@ export async function usuarioLogout(req, res) {
 
     }
 
-    return;
+
 }
 
 
@@ -81,7 +79,7 @@ export async function usuarioLogin(req, res) {
         //let senhadecrypt = await decryptMD5(req.body.senha);
         // console.log("decript no login " + senhadecrypt['str']);
 
-        if (logados.get(req.body.registro) === false) {
+        if (logados.getLogar(req.body.registro) === -1) {
 
             db.get('SELECT * FROM usuario WHERE registro=?', [req.body.registro], function (err, row) {
 
@@ -89,14 +87,15 @@ export async function usuarioLogin(req, res) {
 
                     console.log("Registro antes do add");
                     console.log(req.body.registro);
-                    logados.add(req.body.registro);
-                    const token = jwt.sign({ registro: row.registro }, SECRET, { expiresIn: 3000 });
+
+                    const token = jwt.sign({ registro: row.registro }, SECRET, { expiresIn: 30 });
                     res.status(200).json({
                         "registro": row.registro,
                         "success": true,
                         "message": "Login realizado com sucesso.",
                         token
                     });
+                    logados.add(req.body.registro, token);
                     listarUsuarios();
                 } else {
                     res.status(403).json({
@@ -468,9 +467,10 @@ async function listarUsuarios() {
     try {
         let log = logados.islogged();
         console.log("Usuários Logados")
+        console.log(log);
         for (let i = 0; i < log.length; i++) {
 
-            db.get('SELECT * FROM usuario WHERE registro=?', log[i], function (err, row) {
+            db.get('SELECT * FROM usuario WHERE registro=?', log[i].registro, function (err, row) {
 
                 if (row) {
                     console.log(row.registro);

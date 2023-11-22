@@ -34,6 +34,9 @@ export async function verificarADM(req, res, next) {
       }
 
       if (err) {
+        if ((logados.getDeslogar(token)) === 1) {
+          logados.delete(token);
+        }
         res.status(401).json({
           "success": false,
           "message": 'Usuário não autenticado!'
@@ -45,6 +48,9 @@ export async function verificarADM(req, res, next) {
 
           if (row) {
             //db.close;
+            if ((logados.getDeslogar(token)) === 1) {
+              logados.delete(token);
+            }
             res.status(401).json({
               "success": false,
               "message": 'Acesso Expirado, Favor Realizar o Login Novamente!'
@@ -119,6 +125,9 @@ export async function verificarUSER(req, res, next) {
     jwt.verify(token, SECRET, (err, decoded) => {
 
       if (err) {
+        if ((logados.getDeslogar(token)) === 1) {
+          logados.delete(token);
+        }
         res.status(401).json({
           "success": false,
           "message": 'Usuário não autenticado!'
@@ -128,6 +137,10 @@ export async function verificarUSER(req, res, next) {
         db.get('SELECT * FROM blacklist WHERE token=?', [token], function (err, row) {
           //console.log(row);
           if (row) {
+
+            if ((logados.getDeslogar(token)) === 1) {
+              logados.delete(token);
+            }
 
             res.status(401).json({
               "success": false,
@@ -156,7 +169,7 @@ export async function verificarUSER(req, res, next) {
 export async function verificarUSERLogout(req, res, next) {
 
   let db = new sqlite3.Database('./database.db');
-  
+
 
   try {
     const token = req.headers['authorization'].split(' ')[1];
@@ -164,6 +177,10 @@ export async function verificarUSERLogout(req, res, next) {
     console.log(token);
     jwt.verify(token, SECRET, (err, decoded) => {
       if (err) {
+
+        if ((logados.getDeslogar(token)) === 1) {
+          logados.delete(token);
+        }
         res.status(401).json({
           "success": false,
           "message": 'Usuário não autenticado'
@@ -173,6 +190,9 @@ export async function verificarUSERLogout(req, res, next) {
         db.get('SELECT * FROM blacklist WHERE token=?', [token], function (err, row) {
 
           if (row) {
+            if ((logados.getDeslogar(token)) === 1) {
+              logados.delete(token);
+            }
 
             res.status(401).json({
               "success": false,
@@ -223,12 +243,12 @@ export async function verificarCadastro(pessoa) {
 
     }
 
-    if (pessoa.senha== "d41d8cd98f00b204e9800998ecf8427e") {
+    if (pessoa.senha == "d41d8cd98f00b204e9800998ecf8427e") {
       erros.push("Senha não pode ser vazia");
 
     }
-    
-    
+
+
     if (isNaN(pessoa.registro)) {
       erros.push("O Registro Aceita Apenas Números");
 
