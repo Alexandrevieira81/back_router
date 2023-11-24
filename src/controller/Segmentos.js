@@ -47,7 +47,7 @@ export async function selectSegmentos(req, res) {
    
            }); */
 
-        let sql = 'SELECT segmentos.id, pontos_iniciais.nome AS ponto_inicial, pontos_finais.nome AS ponto_final,segmentos.distancia,segmentos.direcao,segmentos.status FROM segmentos INNER JOIN pontos AS pontos_iniciais ON segmentos.ponto_inicial = pontos_iniciais.id INNER JOIN pontos AS pontos_finais ON segmentos.ponto_final = pontos_finais.id';
+        let sql = 'SELECT segmentos.segmento_id, pontos_iniciais.nome AS ponto_inicial, pontos_finais.nome AS ponto_final,segmentos.distancia,segmentos.direcao,segmentos.status FROM segmentos INNER JOIN pontos AS pontos_iniciais ON segmentos.ponto_inicial = pontos_iniciais.ponto_id INNER JOIN pontos AS pontos_finais ON segmentos.ponto_final = pontos_finais.ponto_id';
 
         db.all(sql, function (err, row) {
             console.log(row);
@@ -76,7 +76,7 @@ export async function selectSegmentosID(req, res) {
         console.log(segmento);
 
 
-        let sql = 'SELECT segmentos.id, pontos_iniciais.nome AS ponto_inicial, pontos_finais.nome AS ponto_final,segmentos.distancia,segmentos.direcao,segmentos.status FROM segmentos INNER JOIN pontos AS pontos_iniciais ON segmentos.ponto_inicial = pontos_iniciais.id INNER JOIN pontos AS pontos_finais ON segmentos.ponto_final = pontos_finais.id WHERE segmentos.id=?';
+        let sql = 'SELECT segmentos.segmento_id, pontos_iniciais.nome AS ponto_inicial, pontos_finais.nome AS ponto_final,segmentos.distancia,segmentos.direcao,segmentos.status FROM segmentos INNER JOIN pontos AS pontos_iniciais ON segmentos.ponto_inicial = pontos_iniciais.ponto_id INNER JOIN pontos AS pontos_finais ON segmentos.ponto_final = pontos_finais.ponto_id WHERE segmentos.segmento_id=?';
 
         db.get(sql, [segmento], function (err, row) {
 
@@ -115,7 +115,7 @@ export async function updateSegmentos(req, res) {
         console.log("Dados da Atualização");
         console.log(segmento);
         
-        db.get('UPDATE segmentos SET distancia=?, ponto_inicial=?, ponto_final=?, direcao=?, status=? WHERE id=?', [segmento.distancia, segmento.ponto_inicial, segmento.ponto_final, segmento.direcao, segmento.status, req.params.id], function (err, row) {
+        db.get('UPDATE segmentos SET distancia=?, ponto_inicial=?, ponto_final=?, direcao=?, status=? WHERE segmento_id=?', [segmento.distancia, segmento.ponto_inicial, segmento.ponto_final, segmento.direcao, segmento.status, req.params.id], function (err, row) {
 
             if (!err) {
                 res.status(200).json({
@@ -160,7 +160,7 @@ export async function deleteSegmento(req, res) {
 
         } else {
 
-            db.get('DELETE FROM segmentos WHERE id=?', [req.params.id], function (err, row) {
+            db.get('DELETE FROM segmentos WHERE segmento_id=?', [req.params.id], function (err, row) {
                 res.status(200).json({
                     "success": true,
                     "message": "O Segmento foi apagado com sucesso."

@@ -70,7 +70,7 @@ export async function selectPontosID(req, res) {
         console.log("Selecionado ponto pelo ID");
         console.log(pontosID);
 
-        db.get('SELECT * FROM pontos WHERE id=?', [pontosID], function (err, row) {
+        db.get('SELECT * FROM pontos WHERE ponto_id=?', [pontosID], function (err, row) {
             console.log(row);
             res.status(200).json({ ponto: row, "success": true, "message": "Ponto Encontrado!." });
 
@@ -98,7 +98,7 @@ export async function updatePontos(req, res) {
         console.log("Dados do Update");
         console.log(pontos);
 
-        db.get('UPDATE pontos SET nome=? WHERE id=?', [pontos.nome, req.params.id], function (err, row) {
+        db.get('UPDATE pontos SET nome=? WHERE ponto_id=?', [pontos.nome, req.params.id], function (err, row) {
 
             if (!err) {
                 res.status(200).json({
@@ -143,7 +143,7 @@ export async function deletePontos(req, res) {
 
         } else {
 
-            db.get('DELETE FROM pontos WHERE id=?', [req.params.id], function (err, row) {
+            db.get('DELETE FROM pontos WHERE ponto_id=?', [req.params.id], function (err, row) {
                 res.status(200).json({
                     "success": true,
                     "message": "O Ponto foi apagado com sucesso."
