@@ -24,7 +24,7 @@ export async function insertSegmentos(req, res) {
 
     } catch (error) {
 
-        res.status(400).json({
+        res.status(403).json({
             "success": false,
             "message": "Não foi possível cadastrar o Segmento."
         });
@@ -56,7 +56,7 @@ export async function selectSegmentos(req, res) {
         });
 
     } catch (error) {
-        res.status(400).json({
+        res.status(403).json({
             "success": false,
             "message": "Não foi Possível Caregar os Segmentos."
         });

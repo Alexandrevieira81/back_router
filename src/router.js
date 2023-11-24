@@ -28,15 +28,15 @@ router.post('/rotasegmento', insertRotaSegmento);
 
 router.post('/segmentos', verificarADM, insertSegmentos);
 router.put('/segmentos/:id', verificarADM, updateSegmentos);
-router.get('/segmentos', selectSegmentos);
-router.get('/segmentos/:id', selectSegmentosID);
-router.delete('/segmentos/:id', deleteSegmento);
+router.get('/segmentos', verificarUSER, selectSegmentos);
+router.get('/segmentos/:id',verificarUSER, selectSegmentosID);
+router.delete('/segmentos/:id', verificarADM,deleteSegmento);
 
-router.post('/pontos', insertPonto);
-router.get('/pontos', selectPontos);
-router.get('/pontos/:id', selectPontosID);
-router.put('/pontos/:id', updatePontos);
-router.delete('/pontos/:id', deletePontos);
+router.post('/pontos',verificarADM, insertPonto);
+router.get('/pontos', verificarUSER,selectPontos);
+router.get('/pontos/:id',verificarUSER, selectPontosID);
+router.put('/pontos/:id', verificarADM,updatePontos);
+router.delete('/pontos/:id', verificarADM, deletePontos);
 
 //seleciona todos os pontos de segmento para o usuário poder escolher sua origem e destino
 //router.get('/segmentos', selectAllSegmentos);

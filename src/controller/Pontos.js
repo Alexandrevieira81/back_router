@@ -116,7 +116,7 @@ export async function updatePontos(req, res) {
 
     } catch (error) {
 
-        res.status(400).json({
+        res.status(403).json({
             "success": false,
             "message": "Não foi possível Alterar o Ponto."
         });
@@ -136,7 +136,7 @@ export async function deletePontos(req, res) {
 
         if (!req.params.id) {
 
-            res.status(400).json({
+            res.status(403).json({
                 "success": false,
                 "message": "Informe o Código do Ponto..."
             })
@@ -154,7 +154,7 @@ export async function deletePontos(req, res) {
 
     } catch (error) {
 
-        res.status(400).json({
+        res.status(403).json({
             "success": false,
             "message": "Ponto Inexistente..."
         })

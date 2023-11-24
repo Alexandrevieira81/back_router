@@ -32,7 +32,7 @@ export async function usuarioLogout(req, res) {
         console.log("Usuário " + registro + " Está tentado deslogar utilizando o token " + token);
         if ((logados.getDeslogar(token)) === -1) {
 
-            res.status(403).json({
+            res.status(401).json({
                 "success": false,
                 "message": "Problemas ao Deslogar Usuário não está Logado",
 
@@ -56,7 +56,7 @@ export async function usuarioLogout(req, res) {
 
     } catch (error) {
 
-        res.status(403).json({
+        res.status(401).json({
             "success": false,
             "message": "Problemas ao Deslogar",
 
@@ -88,7 +88,7 @@ export async function usuarioLogin(req, res) {
                     console.log("Registro antes do add");
                     console.log(req.body.registro);
 
-                    const token = jwt.sign({ registro: row.registro }, SECRET, { expiresIn: 30 });
+                    const token = jwt.sign({ registro: row.registro }, SECRET, { expiresIn: 2000 });
                     res.status(200).json({
                         "registro": row.registro,
                         "success": true,
@@ -98,7 +98,7 @@ export async function usuarioLogin(req, res) {
                     logados.add(req.body.registro, token);
                     listarUsuarios();
                 } else {
-                    res.status(403).json({
+                    res.status(401).json({
                         "success": false,
                         "message": "Não foi possível realizar o Login Verifique suas credenciais."
                     });
@@ -106,7 +106,7 @@ export async function usuarioLogin(req, res) {
             });
 
         } else {
-            res.status(403).json({
+            res.status(401).json({
                 "success": false,
                 "message": "Problemas ao Logar Usuário já está Logado",
             });
@@ -114,7 +114,7 @@ export async function usuarioLogin(req, res) {
 
     } catch (error) {
 
-        res.status(403).json({
+        res.status(401).json({
             "success": false,
             "message": "Ocorreu uma exceção realizar o Login Verifique suas credenciais."
         });

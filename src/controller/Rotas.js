@@ -35,7 +35,7 @@ export async function insertSegmento(req, res) {
 
     } catch (error) {
 
-        res.status(400).json({
+        res.status(403).json({
             "success": false,
             "message": "Não foi possível cadastrar o Segmento."
         });
@@ -95,7 +95,7 @@ export async function bloquearDesbloquerSegmento(req, res) {
 
     } catch (error) {
 
-        res.status(400).json({
+        res.status(403).json({
             "success": false,
             "message": "Não foi possível Mudar o Status do Segmento."
         });
@@ -120,7 +120,7 @@ export async function insertRota(req, res) {
 
     } catch (error) {
 
-        res.status(400).json({
+        res.status(403).json({
             "success": false,
             "message": "Não foi possível cadastrar a Rota."
         });
@@ -146,7 +146,7 @@ export async function insertRotaSegmento(req, res) {
 
     } catch (error) {
 
-        res.status(400).json({
+        res.status(403).json({
             "success": false,
             "message": "Não foi possível Vincular o Segmento."
         });
@@ -180,7 +180,7 @@ export async function selectRotas(req, res) {
                 flag_rota_nomeAux = row[0].nome_rota;
 
             } else {
-                res.status(400).json({
+                res.status(403).json({
                     "success": false,
                     "message": "Informe o ponto de origem da destino da rota!"
                 });
@@ -306,7 +306,7 @@ export async function selectAllRotas(req, res) {
         });
 
     } catch (error) {
-        res.status(400).json({
+        res.status(403).json({
             "success": false,
             "message": "Não foi Possível Caregar os Segmentos."
         });
