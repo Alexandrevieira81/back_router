@@ -1,5 +1,6 @@
 import { openDb } from "../configDB.js";
 import sqlite3 from 'sqlite3';
+import { verificarCadastroSegmento, verificarCadastroPontos } from "../funcoes.js";
 
 const dbx = await openDb();
 
@@ -9,6 +10,7 @@ export async function createTableSegmentos() {
 
 export async function insertSegmentos(req, res) {
     let segmento;
+    let erros;
 
     try {
 
@@ -16,11 +18,26 @@ export async function insertSegmentos(req, res) {
         console.log("CADASTRANDO segmentos");
         console.log(segmento);
 
-        await dbx.get('INSERT INTO segmentos(distancia, direcao, ponto_inicial, ponto_final,status) VALUES (?,?,?,?,?)', [segmento.distancia, segmento.direcao, segmento.ponto_inicial, segmento.ponto_final, segmento.status]);
-        res.status(200).json({
-            "success": true,
-            "message": "Segmento cadastrado com Sucesso."
-        });
+        segmento.distancia = segmento.distancia.toString().replace(",", ".");
+        erros = await verificarCadastroSegmento(segmento);
+
+        if (erros.length == 0) {
+
+            await dbx.get('INSERT INTO segmentos(distancia, direcao, ponto_inicial, ponto_final,status) VALUES (?,?,?,?,?)', [segmento.distancia, segmento.direcao, segmento.ponto_inicial, segmento.ponto_final, segmento.status]);
+            res.status(200).json({
+                "success": true,
+                "message": "Segmento cadastrado com Sucesso."
+            });
+
+        } else {
+            res.status(403).json({
+                "success": false,
+                "message": erros
+            })
+
+        }
+
+
 
     } catch (error) {
 
@@ -65,13 +82,13 @@ export async function selectSegmentos(req, res) {
 
 export async function selectSegmentosID(req, res) {
     let segmento;
-   
+
 
     let db = new sqlite3.Database('./database.db');
 
     try {
 
-        let segmento = req.params.id;
+        segmento = req.params.id;
         console.log("Selecionado Segmento pelo ID");
         console.log(segmento);
 
@@ -105,7 +122,8 @@ export async function selectSegmentosID(req, res) {
 
 export async function updateSegmentos(req, res) {
     let segmento;
-    
+    let erros;
+
     let db = new sqlite3.Database('./database.db');
     try {
 
@@ -114,22 +132,36 @@ export async function updateSegmentos(req, res) {
         console.log(req.params.id);
         console.log("Dados da Atualização");
         console.log(segmento);
-        
-        db.get('UPDATE segmentos SET distancia=?, ponto_inicial=?, ponto_final=?, direcao=?, status=? WHERE segmento_id=?', [segmento.distancia, segmento.ponto_inicial, segmento.ponto_final, segmento.direcao, segmento.status, req.params.id], function (err, row) {
+        segmento.distancia = segmento.distancia.toString().replace(",", ".");
+        erros = await verificarCadastroSegmento(segmento);
 
-            if (!err) {
-                res.status(200).json({
-                    "success": true,
-                    "message": "Segmento Alterado com Sucesso."
-                });
+        if (erros.length == 0) {
 
-            } else {
-                res.status(403).json({
-                    "success": false,
-                    "message": "Não foi possível Alterar o Segmento."
-                });
-            }
-        });
+            db.get('UPDATE segmentos SET distancia=?, ponto_inicial=?, ponto_final=?, direcao=?, status=? WHERE segmento_id=?', [segmento.distancia, segmento.ponto_inicial, segmento.ponto_final, segmento.direcao, segmento.status, req.params.id], function (err, row) {
+
+                if (!err) {
+                    res.status(200).json({
+                        "success": true,
+                        "message": "Segmento Alterado com Sucesso."
+                    });
+
+                } else {
+                    res.status(403).json({
+                        "success": false,
+                        "message": "Não foi possível Alterar o Segmento."
+                    });
+                }
+            });
+
+        } else {
+            res.status(403).json({
+                "success": false,
+                "message": erros
+            })
+
+        }
+
+
 
     } catch (error) {
 

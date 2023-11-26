@@ -1,5 +1,6 @@
 import { openDb } from "../configDB.js";
 import sqlite3 from 'sqlite3';
+import { verificarCadastroPontos } from "../funcoes.js";
 
 const dbx = await openDb();
 
@@ -10,17 +11,32 @@ export async function createTablePontos() {
 
 export async function insertPonto(req, res) {
     let ponto;
+    let erros;
 
     try {
         ponto = req.body;
         console.log("Cadastrando Ponto");
         console.log(ponto);
 
-        await dbx.get('INSERT INTO pontos(nome) VALUES (?)', [ponto.nome]);
-        res.status(200).json({
-            "success": true,
-            "message": "Ponto cadastrado com Sucesso."
-        });
+        erros = await verificarCadastroPontos(ponto);
+
+        if (erros.length == 0) {
+
+            await dbx.get('INSERT INTO pontos(nome) VALUES (?)', [ponto.nome]);
+            res.status(200).json({
+                "success": true,
+                "message": "Ponto cadastrado com Sucesso."
+            });
+
+        } else {
+            res.status(403).json({
+                "success": false,
+                "message": erros
+            })
+
+        }
+
+
 
     } catch (error) {
 
@@ -33,14 +49,14 @@ export async function insertPonto(req, res) {
 }
 
 export async function selectPontos(req, res) {
-    
+
     let db = new sqlite3.Database('./database.db');
 
     try {
 
-        
+
         console.log("Selecionando Todos os Pontos");
-        
+
 
         db.all('SELECT * FROM pontos', function (err, row) {
             console.log(row);
@@ -60,7 +76,7 @@ export async function selectPontos(req, res) {
 
 export async function selectPontosID(req, res) {
     let pontosID;
-    
+
 
     let db = new sqlite3.Database('./database.db');
 
@@ -88,7 +104,8 @@ export async function selectPontosID(req, res) {
 
 export async function updatePontos(req, res) {
     let pontos;
-   
+    let erros;
+
     let db = new sqlite3.Database('./database.db');
     try {
 
@@ -98,21 +115,34 @@ export async function updatePontos(req, res) {
         console.log("Dados do Update");
         console.log(pontos);
 
-        db.get('UPDATE pontos SET nome=? WHERE ponto_id=?', [pontos.nome, req.params.id], function (err, row) {
+        erros = await verificarCadastroPontos(pontos);
 
-            if (!err) {
-                res.status(200).json({
-                    "success": true,
-                    "message": "Ponto Alterado com Sucesso."
-                });
+        if (erros.length == 0) {
 
-            } else {
-                res.status(403).json({
-                    "success": false,
-                    "message": "Não foi possível Alterar o Ponto."
-                });
-            }
-        });
+            db.get('UPDATE pontos SET nome=? WHERE ponto_id=?', [pontos.nome, req.params.id], function (err, row) {
+
+                if (!err) {
+                    res.status(200).json({
+                        "success": true,
+                        "message": "Ponto Alterado com Sucesso."
+                    });
+
+                } else {
+                    res.status(403).json({
+                        "success": false,
+                        "message": "Não foi possível Alterar o Ponto."
+                    });
+                }
+            });
+
+        } else {
+            res.status(403).json({
+                "success": false,
+                "message": erros
+            })
+
+        }
+
 
     } catch (error) {
 

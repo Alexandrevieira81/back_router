@@ -290,6 +290,66 @@ export async function verificarCadastro(pessoa) {
   }
 
 }
+export async function verificarCadastroSegmento(segmento) {
+  let erros = [];
+  let distancia;
+
+  if (typeof segmento.distancia === "number") {
+    distancia = (String(segmento.distancia));
+
+
+  } else {
+    distancia = segmento.distancia;
+
+  }
+
+
+  if (isNaN(distancia)) {
+    erros.push("A distância Aceita Apenas Números");
+
+  }
+  if (isNaN(segmento.status)) {
+    erros.push("O Status Aceita Apenas Números");
+
+  }
+
+  if ((segmento.status != 1) && (segmento.status != 0)) {
+    erros.push("O Status Aceita Apenas 0 ou 1");
+
+  }
+
+  if ((segmento.distancia === "") || (segmento.ponto_inicial === "") || (segmento.ponto_final === "") || (segmento.status === "") || (segmento.direcao === "")) {
+    erros.push("Não Podem Existtir Campos Vazios");
+
+  }
+
+  if ((segmento.distancia === " ") || (segmento.ponto_inicial === " ") || (segmento.ponto_final === " ") || (segmento.status === " ") || (segmento.direcao === " ")) {
+    erros.push("Não Podem Existtir Campos Vazios");
+
+  }
+  if ((segmento.distancia === null) || (segmento.ponto_inicial === null) || (segmento.ponto_final === null) || (segmento.status === null) || (segmento.direcao === null)) {
+    erros.push("Não Podem Existtir Campos Nulos");
+
+  }
+  return erros;
+
+}
+
+export async function verificarCadastroPontos(ponto) {
+  let erros = [];
+
+  if (ponto.nome === "") {
+    erros.push("Não Podem Existtir Campos Vazios");
+  }
+  if (ponto.nome === " ") {
+    erros.push("Não Podem Existtir Campos Vazios");
+  }
+  if (ponto.nome === null) {
+    erros.push("Não Podem Existtir Campos Nulos");
+  }
+  return erros;
+
+}
 
 export async function verificarLastADM() {
 
