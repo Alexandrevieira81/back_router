@@ -6,6 +6,7 @@ import bcrypt from 'bcrypt';
 const SECRET = 'alexvieira';
 import ReverseMd5 from 'reverse-md5';
 import { logados } from "../app.js";
+import fs from 'fs';
 const dbx = await openDb();
 
 export async function createTableUsuarios() {
@@ -463,27 +464,39 @@ export async function deleteUsuarios(req, res) {
 }
 async function listarUsuarios() {
     let db = new sqlite3.Database('./database.db');
+    let usuario = [];
+    let row;
+    let aux;
 
     try {
         let log = logados.islogged();
         console.log("Usuários Logados")
-        console.log(log);
+       // console.log(log);
         for (let i = 0; i < log.length; i++) {
-
-            db.get('SELECT * FROM usuario WHERE registro=?', log[i].registro, function (err, row) {
+            console.log("passou no for "+log[i].registro);
+           row = await dbx.get(`SELECT * FROM usuario WHERE registro = '${log[i].registro}'`);
+            
 
                 if (row) {
                     console.log(row.registro);
                     console.log(row.nome);
                     console.log("___________________________________________");
+                    aux = "usuario: " +row.nome+ ", "+ "registro: " +row.registro+"---";
+                    usuario.push(aux);
 
                 } else {
                     console.log("Capturou o erro no row");
                 }
 
-            });
+           
 
         }
+
+        console.log(usuario);
+        fs.writeFile('logados.txt', JSON.stringify(usuario), function (err) {
+            if (err) throw err;
+            console.log('Saved!');
+          });
 
     } catch (error) {
 
