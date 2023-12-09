@@ -9,12 +9,12 @@ export async function createTableRota() {
 
 
 export async function createTableSegmento() {
-    await dbx.exec('CREATE TABLE IF NOT EXISTS segmento(idsegmento INTEGER Primary key AUTOINCREMENT, nome VARCHAR(100),distancia int, direcao VARCHAR(20),partida VARCHAR(50),chegada VARCHAR(50),ordem INTEGER,status BOOL)');
+    await dbx.exec('CREATE TABLE IF NOT EXISTS segmento(segmento_id INTEGER Primary key AUTOINCREMENT, nome VARCHAR(100),distancia int, direcao VARCHAR(20),ponto_inicial VARCHAR(50),ponto_final VARCHAR(50),ordem INTEGER,status BOOL)');
 };
 
 export async function createTableSegmentoRota() {
 
-    await dbx.exec('PRAGMA foreign_keys = 1; CREATE TABLE IF NOT EXISTS rotasegmento (id_rota INTEGER , id_segmento INTEGER, FOREIGN KEY(id_rota) REFERENCES rota(idrota),FOREIGN KEY(id_segmento) REFERENCES segmento(idsegmento),PRIMARY KEY(id_rota,id_segmento))');
+    await dbx.exec('PRAGMA foreign_keys = 1; CREATE TABLE IF NOT EXISTS rotasegmento (id_rota INTEGER , segmento_id INTEGER, FOREIGN KEY(id_rota) REFERENCES rota(idrota),FOREIGN KEY(segmento_id) REFERENCES segmento(segmento_id),PRIMARY KEY(id_rota,segmento_id))');
 
 };
 
@@ -51,7 +51,7 @@ export async function bloquearDesbloquerSegmento(req, res) {
         segmento = req.body;
         console.log("Desbloqueando ou Bloqueando Segmento");
         console.log(segmento);
-        db.get('SELECT * FROM segmento WHERE idsegmento=?', segmento.idsegmento, function (err, row) {
+        db.get('SELECT * FROM segmento WHERE segmento_id=?', segmento.segmento_id, function (err, row) {
             console.log("Verificação se o Segmento é válido");
             console.log(row);
             if (row) {
@@ -67,7 +67,7 @@ export async function bloquearDesbloquerSegmento(req, res) {
                 }
                 if ((segmento.status == 0) || (segmento.status == 1)) {
 
-                    db.get('UPDATE segmento SET status=? WHERE idsegmento=?', [segmento.status, segmento.idsegmento], function (err, row) {
+                    db.get('UPDATE segmento SET status=? WHERE segmento_id=?', [segmento.status, segmento.segmento_id], function (err, row) {
                         res.status(200).json({
                             "success": true,
                             "message": "Status Alterado"
@@ -137,7 +137,7 @@ export async function insertRotaSegmento(req, res) {
         console.log("Cadastro de Rota Segmento");
         console.log(rotaseg);
 
-        await dbx.get('INSERT INTO rotasegmento (id_rota , id_segmento) VALUES (?,?)', [rotaseg.id_rota, rotaseg.id_segmento]);
+        await dbx.get('INSERT INTO rotasegmento (id_rota , segmento_id) VALUES (?,?)', [rotaseg.id_rota, rotaseg.id_segmento]);
         res.status(200).json({
             "success": true,
             "message": "Segmento Vinculado com Sucesso."
@@ -170,9 +170,10 @@ export async function selectRotas(req, res) {
     try {
         origem = req.body.origem;
         destino = req.body.destino;
-        console.log("Foi solicitado o cálculo para a rota " + req.body);
+        console.log("Foi solicitado o cálculo para a rota ");
+        console.log( req.body);
 
-        db.all('SELECT rota.nome_rota,segmento.nome,segmento.distancia,segmento.direcao,segmento.ponto_inicial,segmento.ponto_final,segmento.ordem,segmento.status FROM rota,segmento,rotasegmento where rota.origem=? and rota.destino=? and rotasegmento.id_rota = rota.idrota and segmento.idsegmento = rotasegmento.id_segmento', [origem, destino], function (err, row) {
+        db.all('SELECT segmento.segmento_id,rota.nome_rota,segmento.nome,segmento.distancia,segmento.direcao,segmento.ponto_inicial,segmento.ponto_final,segmento.ordem,segmento.status FROM rota,segmento,rotasegmento where rota.origem=? and rota.destino=? and rotasegmento.id_rota = rota.idrota and segmento.segmento_id= rotasegmento.segmento_id', [origem, destino], function (err, row) {
 
             console.log(row);
             if (row != "") {
@@ -299,7 +300,7 @@ export async function selectAllRotas(req, res) {
     try {
         console.log("Entrou no Buscar Todas as Rotas");
 
-        db.all('SELECT rota.nome_rota,segmento.idsegmento,segmento.nome,segmento.distancia,segmento.direcao,segmento.ponto_inicial,segmento.ponto_final,segmento.ordem,segmento.status FROM rota,segmento,rotasegmento where rotasegmento.id_rota = rota.idrota and segmento.idsegmento = rotasegmento.id_segmento ORDER BY nome_rota', function (err, row) {
+        db.all('SELECT rota.nome_rota,segmento.segmento_id,segmento.nome,segmento.distancia,segmento.direcao,segmento.ponto_inicial,segmento.ponto_final,segmento.ordem,segmento.status FROM rota,segmento,rotasegmento where rotasegmento.id_rota = rota.idrota and segmento.segmento_id = rotasegmento.segmento_id ORDER BY nome_rota', function (err, row) {
 
             res.status(200).json(row);
 

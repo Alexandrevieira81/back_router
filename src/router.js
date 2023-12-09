@@ -23,7 +23,7 @@ router.delete('/usuarios/:registro', verificarADM, deleteUsuarios);
 
 
 router.post('/rota', insertRota);
-//router.post('/segmento', insertSegmento);
+router.post('/segmento', insertSegmento);
 router.post('/rotasegmento', insertRotaSegmento);
 
 router.post('/segmentos', verificarADM, insertSegmentos);
