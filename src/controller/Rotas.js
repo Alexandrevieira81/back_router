@@ -216,6 +216,7 @@ export async function selectRotas(req, res) {
                     for (let i = 0; i < rota_filtrada.length; i++) {
                         delete rota_filtrada[i].nome_rota;
                         delete rota_filtrada[i].nome;
+                        delete rota_filtrada[i].ordem;
 
                     }
 
@@ -247,6 +248,7 @@ export async function selectRotas(req, res) {
                 for (let i = 0; i < rota_filtrada.length; i++) {
                     delete rota_filtrada[i].nome_rota;
                     delete rota_filtrada[i].nome;
+                    delete rota_filtrada[i].ordem;
 
                 }
                 res.status(200).json({ "success": true, "message": "Rota calculada com sucesso.", rota: rota_filtrada });
